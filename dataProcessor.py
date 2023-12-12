@@ -1,10 +1,26 @@
+from collections import defaultdict
+import os,math
+import numpy as np
 from typing import Dict, List
-import os
+
+
+def sentencize(string) -> List[str]:
+    return string.split('. ')
+
+def tokenize(string) -> List[str]:
+    return string.lower().replace('. ', ' ').split()
+
+def flatten_list(list:List[List]):
+    return [item for row in list for item in row]
+
 class DataProcessor:
-    tokens: List[str]
-    word_count_dict: Dict[str,int]
+    paths: List[str]
+    occur_dict: Dict[str,List[List[int]]]
+    doc_size:int
     def __init__(self, path=None) -> None:
-        self.tokens = []
+        self.occur_dict = defaultdict(list)
+        self.paths = []
+        self.doc_size = 0
         if path is not None:
             self.add_file(path)
 
@@ -13,31 +29,19 @@ class DataProcessor:
             self.add_file(os.path.join(dir,file))
 
     def add_file(self, path) -> None:
-        self.tokens += self.tokenize(open(path).read())
+        data = open(path).read()
+        sentences = sentencize(data)
 
-    def tokenize(self, string) -> List[str]:
-        return string.lower().split()
+        for token in tokenize(data):
+            self.occur_dict[token] += [[] for _ in range(1+self.doc_size-len(self.occur_dict[token]))]
 
-    def count_word(self, word) -> int:
-        return self.tokens.count(word)
+            for sentence in sentences:
+                self.occur_dict[token][self.doc_size].append(sentence.count(token))
 
-    def create_word_count(self):
-        self.word_count_dict = dict()
+        self.doc_size+=1
 
-        for token in self.tokens:
-            try:
-                self.word_count_dict[token]
-            except(KeyError):
-                self.word_count_dict[token] = self.count_word(token)
-        return self.word_count_dict
-
-    def unique_words(self):
-        return [word for word in self.word_count_dict.keys() if self.word_count_dict[word] == 1]
-
-dp = DataProcessor()
-for i in range(20):
-    dp.add_file(f"/home/nima/Downloads/Telegram Desktop/data/document_{i}.txt")
-# dp.add_file("/home/nima/Downloads/Telegram Desktop/data/document_3.txt")
-# dp.add_dir("/home/nima/Downloads/Telegram Desktop/data")
-print(dp.create_word_count())
-print(dp.unique_words())
+    def __str__(self)->str:
+        output = ""
+        for key in self.occur_dict:
+            output+=f"{key}: Docs: {len(self.occur_dict[key])}, Sentences: {len([row for row in self.occur_dict[key]])}, Occurances: {np.sum(flatten_list(self.occur_dict[key]))}, {flatten_list([self.occur_dict[key]])}\n"
+        return output
