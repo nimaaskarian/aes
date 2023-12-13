@@ -1,9 +1,7 @@
 from collections import defaultdict
-import os,math
+import os
 import numpy as np
-from typing import Dict, List
-
-from psutil import Error
+from typing import List
 
 
 def sentencize(string) -> List[str]:
