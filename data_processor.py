@@ -77,6 +77,22 @@ class DataProcessor:
         except(KeyError):
             return 0
 
+    def docs_occurances_list(self, word:str):
+        self.check_word(word)
+        output_arr = np.zeros(self.doc_size, np.uint16)
+        for key,value in self.occur_dict[word].items():
+            output_arr[key] = np.sum(value)
+        return output_arr
+
+    def docs_words_count_list(self):
+        output_arr = np.zeros(self.doc_size, np.uint16)
+        print(output_arr)
+        for dict in self.occur_dict.values():
+            for key,value in dict.items():
+                output_arr[key] += np.sum(value)
+        
+        return output_arr
+
     def __str__(self)->str:
         output = ""
         for key, value in self.occur_dict.items():
