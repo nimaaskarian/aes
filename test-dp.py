@@ -1,11 +1,10 @@
-import time, os, psutil
+import sys, time, os, psutil
 
 from data_processor import DataProcessor
 
 dp = DataProcessor()
-dp.add_file("tests/doc1")
-dp.add_file("tests/doc2")
-dp.add_file("tests/doc3")
+for i in range(3):
+    dp.add_file(f"tests/doc{i}")
 
 # testing the validity edge cases
 assert(dp.occur_dict["this"] == [[2, 1, 1, 1], [0, 1, 0], [0, 0, 1]])
@@ -15,6 +14,8 @@ assert(dp.occur_dict["lorem"] == [[], [1,0,0]])
 
 # testing the speed
 file_count = 20
+if len(sys.argv) > 1:
+    file_count = int(sys.argv[1])
 start_time = time.time()
 init_ram = psutil.Process(os.getpid()).memory_info().rss
 dp = DataProcessor()
