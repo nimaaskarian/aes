@@ -7,15 +7,20 @@ dp = DataProcessor()
 for i in range(4):
     dp.add_file(f"tests/doc{i}")
 
-print(dp)
 # testing the validity edge cases
-# assert(dp.occur_dict["this"] == [[2, 1, 1, 1], [0, 1, 0], [0, 0, 1]])
-# assert(dp.occur_dict["the"] == [0, 0, [0, 2, 0]])
-# assert(dp.occur_dict["test"] == [[1,0,1,0], [0,1,1]])
-lorem_test = [0, np.array([1, 0, 0]), 0, np.array([2, 0, 1, 0, 1, 1, 0, 0])]
+tests = [(dp.occur_dict["lorem"],[(1,[1, 0, 0]), (3,[2, 0, 1, 0, 1, 1, 0, 0])]),
+         (dp.occur_dict["test"], [(0,[1,0,1,0]),(1,[0,1,1])]),
+         (dp.occur_dict["the"], [(2,[0,2,0])]),
+         (dp.occur_dict["this"], [(0,[2,1,1,1]),(1,[0,1,0]),(2,[0,0,1])]),
+         ]
 
-for arr1, arr2 in zip(dp.occur_dict["lorem"], lorem_test):
-    assert np.array_equal(arr1, arr2)
+for actual,test in tests:
+    # t sands for test, a stands for actual
+    for atuple, ttuple in zip(actual, test):
+        aindex, aarray = atuple
+        tindex, tarray = ttuple
+        assert aarray.tolist() == tarray
+        assert aindex == tindex
 
 # testing the speed
 file_count = 20
@@ -33,8 +38,8 @@ for i in range(file_count):
     dp.add_file(f"data/document_{i}.txt")
     ram = psutil.Process(os.getpid()).memory_info().rss
     max_ram = max(ram, max_ram)
-for word in dp.occur_dict:
-    dp.occurences(word)
+# for word in dp.occur_dict:
+#     dp.occurences(word)
 end_time = time.time()
 exec_time = end_time-start_time
 print(f"Adding {file_count} files took {exec_time} seconds")

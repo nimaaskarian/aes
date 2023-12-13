@@ -36,16 +36,16 @@ class DataProcessor:
 
         for token in set(tokenize(data)):
             # doc count 
-            self.occur_dict[token] += [0 for _ in range(1+self.doc_size-len(self.occur_dict[token]))]
+            # self.occur_dict[token] += [0 for _ in range(1+self.doc_size-len(self.occur_dict[token]))]
             # self.occur_dict[token] += [[] for _ in range(1+self.doc_size-len(self.occur_dict[token]))]
             # sentence count
-            self.occur_dict[token][self.doc_size] = np.zeros(len(sentences),np.uint8)
+            self.occur_dict[token].append((self.doc_size,np.zeros(len(sentences),np.uint8)))
 
         for i, sentence in enumerate(sentences):
             sentence_tokens = tokenize(sentence)
             for token in set(sentence_tokens):
 
-                self.occur_dict[token][self.doc_size][i] = sentence_tokens.count(token)
+                self.occur_dict[token][-1][1][i] = sentence_tokens.count(token)
 
         self.doc_size+=1
 
@@ -56,7 +56,7 @@ class DataProcessor:
 
     def occurences(self, word:str) -> int:
         self.check_word(word)
-        return np.sum(np.concatenate([item for item in self.occur_dict[word] if not isinstance(item, int)]))
+        return np.sum(np.concatenate([item for index,item in self.occur_dict[word]]))
 
     def document_occurences(self, word:str, index:int) -> int:
         if index > self.doc_size or index < 0:
