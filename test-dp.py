@@ -48,9 +48,11 @@ except:
 # testing the speed
 file_count = 200
 time_limit = 0.25
+calculate_occurances = 0
 try:
     file_count = int(sys.argv[1])
-    time_limit = float(sys.argv[2])
+    calculate_occurances = int(sys.argv[2])
+    time_limit = float(sys.argv[3])
 except (IndexError):
     pass
 start_time = time.time()
@@ -61,11 +63,18 @@ for i in range(file_count):
     dp.add_file(f"data/document_{i}.txt")
     ram = psutil.Process(os.getpid()).memory_info().rss
     max_ram = max(ram, max_ram)
-for word in dp.occur_dict:
-    dp.occurences(word)
+
+if calculate_occurances:
+    for word in dp.occur_dict:
+        dp.occurences(word)
+
 end_time = time.time()
 exec_time = end_time-start_time
-print(f"Adding {file_count} files took {exec_time} seconds")
+print(f"Adding {file_count} files took {exec_time} seconds", end=" ")
+if calculate_occurances:
+    print("(Occurances were calculated too)")
+else:
+    print()
 print(f"Max RAM usage of DP was {(max_ram-init_ram)/1024**2} MiB (actual usage was {max_ram/1024**2} MiB)")
 assert(exec_time < time_limit)
 
