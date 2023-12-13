@@ -8,18 +8,18 @@ doc_size_test = 4
 for i in range(doc_size_test):
     dp.add_file(f"tests/doc{i}")
 
-# testing the validity edge cases
-tests = [(dp.occur_dict["lorem"],[(1,[1, 0, 0]), (3,[2, 0, 1, 0, 1, 1, 0, 0])]),
-         (dp.occur_dict["test"], [(0,[1,0,1,0]),(1,[0,1,1])]),
-         (dp.occur_dict["the"], [(2,[0,2,0])]),
-         (dp.occur_dict["this"], [(0,[2,1,1,1]),(1,[0,1,0]),(2,[0,0,1])]),
+# # testing the validity edge cases
+tests = [(dp.occur_dict["lorem"],{1:[1, 0, 0], 3:[2, 0, 1, 0, 1, 1, 0, 0]}),
+         (dp.occur_dict["test"], {0:[1,0,1,0], 1:[0,1,1]}),
+         (dp.occur_dict["the"], {2:[0,2,0]}),
+         (dp.occur_dict["this"], {0:[2,1,1,1],1:[0,1,0],2:[0,0,1]}),
          ]
 
 for actual,test in tests:
     # t sands for test, a stands for actual
-    for atuple, ttuple in zip(actual, test):
-        aindex, aarray = atuple
-        tindex, tarray = ttuple
+    for adict, tdict in zip(actual.items(), test.items()):
+        aindex, aarray = adict
+        tindex, tarray = tdict
         assert aarray.tolist() == tarray
         assert aindex == tindex
 

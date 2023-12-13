@@ -17,7 +17,7 @@ class DataProcessor:
     paths: List[str]
     doc_size:int
     def __init__(self, path=None) -> None:
-        self.occur_dict = defaultdict(list)
+        self.occur_dict = defaultdict(dict)
         self.paths = []
         self.doc_size = 0
         if path is not None:
@@ -33,13 +33,13 @@ class DataProcessor:
 
         for token in set(tokenize(data)):
             # sentence count
-            self.occur_dict[token].append((self.doc_size,np.zeros(len(sentences),np.uint8)))
+            self.occur_dict[token][self.doc_size] = np.zeros(len(sentences),np.uint8)
 
         for i, sentence in enumerate(sentences):
             sentence_tokens = tokenize(sentence)
             for token in set(sentence_tokens):
 
-                self.occur_dict[token][-1][1][i] = sentence_tokens.count(token)
+                self.occur_dict[token][self.doc_size][i] = sentence_tokens.count(token)
 
         self.doc_size+=1
 
@@ -66,7 +66,7 @@ class DataProcessor:
 
     def occurences(self, word:str) -> int:
         self.check_word(word)
-        return np.sum(np.concatenate([item for index,item in self.occur_dict[word]]))
+        return np.sum(np.concatenate(list(self.occur_dict[word].values())))
 
 
     def document_occurences(self, word:str, index:int) -> int:
@@ -74,8 +74,8 @@ class DataProcessor:
             raise RuntimeError(f"Error: index is not valid. valid indexes for this instance are between 0 and {self.doc_size-1}.")
         self.check_word(word)
         try:
-            return np.sum(self.word_search_index(word, index))
-        except(IndexError):
+            return np.sum(self.occur_dict[word][index])
+        except(KeyError):
             return 0
 
     def __str__(self)->str:
