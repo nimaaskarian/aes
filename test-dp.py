@@ -1,6 +1,6 @@
-import sys, time, os, psutil
+import sys, time, os
+import psutil
 
-import numpy as np
 from data_processor import DataProcessor
 
 dp = DataProcessor()
@@ -8,7 +8,7 @@ doc_size_test = 4
 for i in range(doc_size_test):
     dp.add_file(f"tests/doc{i}")
 
-# # testing the validity edge cases
+# testing the validity edge cases
 tests = [(dp.occur_dict["lorem"],{1:[1, 0, 0], 3:[2, 0, 1, 0, 1, 1, 0, 0]}),
          (dp.occur_dict["test"], {0:[1,0,1,0], 1:[0,1,1]}),
          (dp.occur_dict["the"], {2:[0,2,0]}),
@@ -18,10 +18,10 @@ tests = [(dp.occur_dict["lorem"],{1:[1, 0, 0], 3:[2, 0, 1, 0, 1, 1, 0, 0]}),
 for actual,test in tests:
     # t sands for test, a stands for actual
     for adict, tdict in zip(actual.items(), test.items()):
-        aindex, aarray = adict
-        tindex, tarray = tdict
+        akey, aarray = adict
+        tkey, tarray = tdict
         assert aarray.tolist() == tarray
-        assert aindex == tindex
+        assert akey == tkey
 
 # occurences calculation
 assert(dp.document_occurences("lorem", 1) == 1)
