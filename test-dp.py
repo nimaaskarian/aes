@@ -1,6 +1,15 @@
 import sys, time, os
 import psutil
 
+class bcolors:
+    GREEN = '\033[92m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    WARNING = '\033[93m'
+    BOLD = '\033[1m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
 from data_processor import DataProcessor
 
 dp = DataProcessor()
@@ -45,6 +54,12 @@ try:
 except(RuntimeError):
     pass
 
+try:
+    dp.document_occurences("test",-1)
+    assert(False)
+except(RuntimeError):
+    pass
+
 # testing the speed
 file_count = 200
 time_limit = 0.25
@@ -70,12 +85,12 @@ if calculate_occurances:
 
 end_time = time.time()
 exec_time = end_time-start_time
-print(f"Adding {file_count} files took {exec_time} seconds", end=" ")
+print(f"Adding {bcolors.BLUE}{file_count}{bcolors.ENDC} files took {bcolors.BLUE}{exec_time:.3f}{bcolors.ENDC} seconds", end=" ")
 if calculate_occurances:
     print("(Occurances were calculated too)")
 else:
     print()
-print(f"Max RAM usage of DP was {(max_ram-init_ram)/1024**2} MiB (actual usage was {max_ram/1024**2} MiB)")
+print(f"Max RAM usage of DP was {bcolors.BLUE}{(max_ram-init_ram)/1024**2:.3f} MiB{bcolors.ENDC} (actual usage was {bcolors.BLUE}{max_ram/1024**2:.3f} MiB{bcolors.ENDC})")
 assert(exec_time < time_limit)
 
-print("Tests are completed successfully!")
+print(bcolors.BOLD+bcolors.GREEN+"Tests are completed successfully!"+bcolors.ENDC)
