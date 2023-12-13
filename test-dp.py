@@ -70,8 +70,8 @@ try:
     time_limit = float(sys.argv[3])
 except (IndexError):
     pass
-start_time = time.time()
 init_ram = psutil.Process(os.getpid()).memory_info().rss
+start_time = time.time()
 dp = DataProcessor()
 max_ram = 0
 for i in range(file_count):

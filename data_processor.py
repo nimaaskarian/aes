@@ -1,7 +1,8 @@
 from collections import defaultdict
 import os
 import numpy as np
-from typing import List
+import numpy.typing as npt
+from typing import Dict, List
 
 
 def sentencize(string) -> List[str]:
@@ -12,11 +13,11 @@ def tokenize(string) -> List[str]:
 
 
 class DataProcessor:
-    paths: List[str]
     doc_size:int
+    occur_dict:Dict[str,Dict[int,npt.NDArray]]
     def __init__(self, path=None) -> None:
         self.occur_dict = defaultdict(dict)
-        self.paths = []
+        self.sentences_size = list()
         self.doc_size = 0
         if path is not None:
             self.add_file(path)
@@ -28,15 +29,15 @@ class DataProcessor:
     def add_file(self, path) -> None:
         data = open(path).read()
         sentences = sentencize(data)
+        self.sentences_size.append(len(sentences))
 
         for token in set(tokenize(data)):
             # sentence count
-            self.occur_dict[token][self.doc_size] = np.zeros(len(sentences),np.uint8)
+            self.occur_dict[token][self.doc_size] = np.zeros(self.sentences_size[self.doc_size],np.uint8)
 
         for i, sentence in enumerate(sentences):
             sentence_tokens = tokenize(sentence)
             for token in set(sentence_tokens):
-
                 self.occur_dict[token][self.doc_size][i] = sentence_tokens.count(token)
 
         self.doc_size+=1
