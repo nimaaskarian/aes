@@ -32,11 +32,17 @@ class DataProcessor:
         data = open(path).read()
         sentences = sentencize(data)
 
-        for token in tokenize(data):
+        for token in set(tokenize(data)):
+            # doc count 
             self.occur_dict[token] += [[] for _ in range(1+self.doc_size-len(self.occur_dict[token]))]
+            # sentence count
+            self.occur_dict[token][self.doc_size] = np.zeros(len(sentences),int).tolist()
 
-            for sentence in sentences:
-                self.occur_dict[token][self.doc_size].append(sentence.count(token))
+        for i, sentence in enumerate(sentences):
+            sentence_tokens = tokenize(sentence)
+            for token in set(sentence_tokens):
+
+                self.occur_dict[token][self.doc_size][i] = sentence_tokens.count(token)
 
         self.doc_size+=1
 
