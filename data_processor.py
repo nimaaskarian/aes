@@ -15,7 +15,6 @@ def tokenize(string) -> List[str]:
 
 class DataProcessor:
     paths: List[str]
-    # occur_dict: Dict[str,List[List[int]]]
     doc_size:int
     def __init__(self, path=None) -> None:
         self.occur_dict = defaultdict(list)
@@ -33,9 +32,6 @@ class DataProcessor:
         sentences = sentencize(data)
 
         for token in set(tokenize(data)):
-            # doc count 
-            # self.occur_dict[token] += [0 for _ in range(1+self.doc_size-len(self.occur_dict[token]))]
-            # self.occur_dict[token] += [[] for _ in range(1+self.doc_size-len(self.occur_dict[token]))]
             # sentence count
             self.occur_dict[token].append((self.doc_size,np.zeros(len(sentences),np.uint8)))
 

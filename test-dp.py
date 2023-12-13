@@ -36,13 +36,13 @@ assert(dp.document_occurences("this", 0) == 5)
 try:
     dp.occurences("madeupword")
     assert(False)
-except:
+except(RuntimeError):
     pass
 
 try:
     dp.document_occurences("test",doc_size_test)
     assert(False)
-except:
+except(RuntimeError):
     pass
 
 # testing the speed

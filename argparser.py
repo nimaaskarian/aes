@@ -6,8 +6,7 @@ def is_file(str):
     if os.path.isfile(str):
         return str
     else:
-        print(f"Error: path \"{str}\" doesn't exist.")
-        exit(1)
+        raise RuntimeError(f"Error: path \"{str}\" doesn't exist.")
 
 parser = argparse.ArgumentParser(prog="main.py", description="yet another simple search engine, a uni project.")
 parser.add_argument('files',action="extend", nargs="*", type=is_file, default=[])
