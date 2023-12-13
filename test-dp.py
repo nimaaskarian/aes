@@ -4,7 +4,8 @@ import numpy as np
 from data_processor import DataProcessor
 
 dp = DataProcessor()
-for i in range(4):
+doc_size_test = 4
+for i in range(doc_size_test):
     dp.add_file(f"tests/doc{i}")
 
 # testing the validity edge cases
@@ -22,9 +23,31 @@ for actual,test in tests:
         assert aarray.tolist() == tarray
         assert aindex == tindex
 
+# occurences calculation
+assert(dp.document_occurences("lorem", 1) == 1)
+assert(dp.document_occurences("lorem", 3) == 5)
+assert(dp.occurences("lorem") == 6)
+
+assert(dp.document_occurences("this", 3) == 0)
+assert(dp.occurences("this") == 7)
+assert(dp.document_occurences("this", 0) == 5)
+
+# error handling
+try:
+    dp.occurences("madeupword")
+    assert(False)
+except:
+    pass
+
+try:
+    dp.document_occurences("test",doc_size_test)
+    assert(False)
+except:
+    pass
+
 # testing the speed
-file_count = 20
-time_limit = 0.5
+file_count = 200
+time_limit = 0.25
 try:
     file_count = int(sys.argv[1])
     time_limit = float(sys.argv[2])
@@ -38,8 +61,8 @@ for i in range(file_count):
     dp.add_file(f"data/document_{i}.txt")
     ram = psutil.Process(os.getpid()).memory_info().rss
     max_ram = max(ram, max_ram)
-# for word in dp.occur_dict:
-#     dp.occurences(word)
+for word in dp.occur_dict:
+    dp.occurences(word)
 end_time = time.time()
 exec_time = end_time-start_time
 print(f"Adding {file_count} files took {exec_time} seconds")

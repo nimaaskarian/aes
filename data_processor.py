@@ -12,8 +12,6 @@ def sentencize(string) -> List[str]:
 def tokenize(string) -> List[str]:
     return string.lower().replace('. ', ' ').split()
 
-def flatten_list(list:List[List]):
-    return [item for row in list for item in row]
 
 class DataProcessor:
     paths: List[str]
@@ -49,21 +47,38 @@ class DataProcessor:
 
         self.doc_size+=1
 
+    def word_search_index(self, word:str, index:int):
+        self.check_word(word)
+        high = len(self.occur_dict[word])
+        low = 0
+        while low <= high:
+            mid = low+(high-low)//2
+
+            if index == self.occur_dict[word][mid][0]:
+                return self.occur_dict[word][mid][1]
+
+            if index > self.occur_dict[word][mid][0]:
+                low = mid+1
+            else:
+                high = mid-1
+        return 0
+            
     # development helpers
     def check_word(self, word:str):
         if word not in self.occur_dict:
-            raise Error(f"Error: word \"{word}\" not found in this instance of DataProcessor.")
+            raise RuntimeError(f"Error: word \"{word}\" not found in this instance of DataProcessor.")
 
     def occurences(self, word:str) -> int:
         self.check_word(word)
         return np.sum(np.concatenate([item for index,item in self.occur_dict[word]]))
 
+
     def document_occurences(self, word:str, index:int) -> int:
-        if index > self.doc_size or index < 0:
-            raise Error(f"Error: index is not valid. valid indexes for this instance are between 0 and {self.doc_size}.")
+        if index >= self.doc_size or index < 0:
+            raise RuntimeError(f"Error: index is not valid. valid indexes for this instance are between 0 and {self.doc_size-1}.")
         self.check_word(word)
         try:
-            return np.sum(self.occur_dict[word][index])
+            return np.sum(self.word_search_index(word, index))
         except(IndexError):
             return 0
 
