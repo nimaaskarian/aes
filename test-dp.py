@@ -1,6 +1,5 @@
 import unittest
 from data_processor import DataProcessor
-from bcolors import bcolors
 
 class TestDataProcessor(unittest.TestCase):
     def setUp(self):
@@ -21,8 +20,8 @@ class TestDataProcessor(unittest.TestCase):
         dp_data.add_file("data/document_8666.txt")
         dp_data.generate()
 
-        self.assertEqual(self.dp.docs_words_count_list().tolist(), [23, 22, 47, 105])
-        self.assertEqual(dp_data.docs_words_count_list().tolist(), [607, 362])
+        self.assertEqual(self.dp.word_count_in_each_doc.tolist(), [23, 22, 47, 105])
+        self.assertEqual(dp_data.word_count_in_each_doc.tolist(), [607, 362])
 
     def test_add_data_file(self):
         self.assertEqual(self.dp.paths, [f"tests/doc{i}" for i in range(self.DOC_SIZE)])

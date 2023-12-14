@@ -30,14 +30,14 @@ class DataProcessor:
         self.paths.append(path)
 
     def generate(self):
-        self.doc_wordcount_list = np.zeros(len(self.paths), np.uint16)
+        self.word_count_in_each_doc = np.zeros(len(self.paths), np.uint16)
         for doc_index, path in enumerate(self.paths):
             file = open(path)
             data = file.read()
             file.close()
             sentences = sentencize(data)
             self.sentences_size.append(len(sentences))
-            self.doc_wordcount_list[doc_index] = len(tokenize(data))
+            self.word_count_in_each_doc[doc_index] = len(tokenize(data))
 
             for token in set(tokenize(data)):
                 # sentence count
@@ -73,15 +73,6 @@ class DataProcessor:
         output_arr = np.zeros(len(self.paths), np.uint16)
         for key,value in self.occur_dict[word].items():
             output_arr[key] = np.sum(value)
-        return output_arr
-
-    def docs_words_count_list(self):
-        output_arr = np.zeros(len(self.paths), np.uint16)
-        for dict in self.occur_dict.values():
-            for key,value in dict.items():
-                output_arr[key] += np.sum(value)
-                # np.add.at(output_arr, key, np.sum(value))
-        
         return output_arr
 
     def __str__(self)->str:
