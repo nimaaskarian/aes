@@ -5,8 +5,9 @@ import numpy.typing as npt
 from typing import Dict, List
 
 
-def sentencize(string) -> List[str]:
-    return string.split('. ')
+def sentencize(str) -> List[str]:
+    return list(filter(None, re.split(r'\.\s+', str)))
+    # return str.split('. ')
 
 def tokenize(str) -> List[str]:
     return str.lower().translate(str.maketrans('', '', string.punctuation)).split()
@@ -32,9 +33,8 @@ class DataProcessor:
     def generate(self):
         self.word_count_in_each_doc = np.zeros(len(self.paths), np.uint16)
         for doc_index, path in enumerate(self.paths):
-            file = open(path)
-            data = file.read()
-            file.close()
+            with open(path) as file:
+                data = file.read()
             sentences = sentencize(data)
             self.sentences_size.append(len(sentences))
             self.word_count_in_each_doc[doc_index] = len(tokenize(data))
@@ -52,7 +52,12 @@ class DataProcessor:
     # development helpers
     def check_word(self, word:str):
         if word not in self.occur_dict:
-            raise RuntimeError(f"Error: word \"{word}\" not found in this instance of DataProcessor.")
+            raise KeyError(f"Error: word \"{word}\" not found in this instance of DataProcessor.")
+
+    def sentence_at(self, doc_index:int, sentence_index:int):
+        with open(self.paths[doc_index]) as file:
+            data = file.read()
+        return sentencize(data)[sentence_index]
 
     def occurences(self, word:str) -> int:
         self.check_word(word)
@@ -61,7 +66,7 @@ class DataProcessor:
 
     def document_occurences(self, word:str, index:int) -> int:
         if index >= len(self.paths) or index < 0:
-            raise RuntimeError(f"Error: index is not valid. valid indexes for this instance are between 0 and {len(self.paths)-1}.")
+            raise IndexError(f"Error: index is not valid. valid indexes for this instance are between 0 and {len(self.paths)-1}.")
         self.check_word(word)
         try:
             return np.sum(self.occur_dict[word][index])
