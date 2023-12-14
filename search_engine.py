@@ -10,7 +10,6 @@ class SearchEngine:
     def __init__(self, paths:List[str]) -> None:
         self.tf_idf_dict = dict()
         self.dp = DataProcessor()
-        doc = list()
         for path in paths:
             self.dp.add_file(path)
         self.dp.generate()
