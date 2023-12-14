@@ -12,7 +12,6 @@ def tokenize(str) -> List[str]:
     return str.lower().translate(str.maketrans('', '', string.punctuation)).split()
     # return str.lower().replace('. ', ' ').split()
 
-
 class DataProcessor:
     paths: List[str]
     occur_dict:Dict[str,Dict[int,npt.NDArray]]
@@ -33,7 +32,9 @@ class DataProcessor:
     def generate(self):
         self.doc_wordcount_list = np.zeros(len(self.paths), np.uint16)
         for doc_index, path in enumerate(self.paths):
-            data = open(path).read()
+            file = open(path)
+            data = file.read()
+            file.close()
             sentences = sentencize(data)
             self.sentences_size.append(len(sentences))
             self.doc_wordcount_list[doc_index] = len(tokenize(data))
@@ -48,22 +49,6 @@ class DataProcessor:
                 for token in set(sentence_tokens):
                     self.occur_dict[token][doc_index][i] = sentence_tokens.count(token)
 
-    def word_search_index(self, word:str, index:int):
-        self.check_word(word)
-        high = len(self.occur_dict[word])
-        low = 0
-        while low <= high:
-            mid = low+(high-low)//2
-
-            if index == self.occur_dict[word][mid][0]:
-                return self.occur_dict[word][mid][1]
-
-            if index > self.occur_dict[word][mid][0]:
-                low = mid+1
-            else:
-                high = mid-1
-        return 0
-            
     # development helpers
     def check_word(self, word:str):
         if word not in self.occur_dict:
