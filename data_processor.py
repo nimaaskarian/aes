@@ -1,5 +1,5 @@
 from collections import defaultdict
-import os
+import os, re, string
 import numpy as np
 import numpy.typing as npt
 from typing import Dict, List
@@ -8,8 +8,9 @@ from typing import Dict, List
 def sentencize(string) -> List[str]:
     return string.split('. ')
 
-def tokenize(string) -> List[str]:
-    return string.lower().replace('. ', ' ').split()
+def tokenize(str) -> List[str]:
+    return str.lower().translate(str.maketrans('', '', string.punctuation)).split()
+    # return str.lower().replace('. ', ' ').split()
 
 
 class DataProcessor:
