@@ -1,5 +1,4 @@
 import sys, time, os
-import psutil
 
 class bcolors:
     GREEN = '\033[92m'
@@ -16,7 +15,7 @@ dp = DataProcessor()
 doc_size_test = 4
 for i in range(doc_size_test):
     dp.add_file(f"tests/doc{i}")
-
+dp.generate()
 # testing the validity edge cases
 tests = [(dp.occur_dict["lorem"],{1:[1, 0, 0], 3:[2, 0, 1, 0, 1, 1, 0, 0]}),
          (dp.occur_dict["test"], {0:[1,0,1,0], 1:[0,1,1]}),
@@ -33,6 +32,7 @@ for actual,test in tests:
         assert akey == tkey
 
 # occurences calculation
+print(dp.document_occurences("lorem", 1))
 assert(dp.document_occurences("lorem", 1) == 1)
 assert(dp.document_occurences("lorem", 3) == 5)
 assert(dp.occurences("lorem") == 6)
@@ -70,14 +70,11 @@ try:
     time_limit = float(sys.argv[3])
 except (IndexError):
     pass
-init_ram = psutil.Process(os.getpid()).memory_info().rss
 start_time = time.time()
 dp = DataProcessor()
-max_ram = 0
 for i in range(file_count):
     dp.add_file(f"data/document_{i}.txt")
-    ram = psutil.Process(os.getpid()).memory_info().rss
-    max_ram = max(ram, max_ram)
+dp.generate()
 
 if calculate_occurances:
     for word in dp.occur_dict:
@@ -90,7 +87,6 @@ if calculate_occurances:
     print("(Occurances were calculated too)")
 else:
     print()
-print(f"Max RAM usage of DP was {bcolors.BLUE}{(max_ram-init_ram)/1024**2:.3f} MiB{bcolors.ENDC} (actual usage was {bcolors.BLUE}{max_ram/1024**2:.3f} MiB{bcolors.ENDC})")
 assert(exec_time < time_limit)
 
 print(bcolors.BOLD+bcolors.GREEN+"Tests are completed successfully!"+bcolors.ENDC)

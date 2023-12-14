@@ -1,3 +1,9 @@
 data.json
 data/
 __pycache__/
+lib/
+bin/
+pyvenv.cfg
+lib64
+fil-result/
+share/
