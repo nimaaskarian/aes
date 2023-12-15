@@ -29,5 +29,9 @@ if calculate_occurances:
     print("(Occurances were calculated too)")
 else:
     print()
-assert(exec_time < time_limit)
-print(bcolors.GREEN+bcolors.BOLD+"Speed seems good!"+bcolors.ENDC)
+try:
+    assert(exec_time < time_limit)
+    print(bcolors.GREEN+bcolors.BOLD+"Speed seems good!"+bcolors.ENDC)
+except (AssertionError):
+    print(bcolors.RED + "Speed test failed! 💀" + bcolors.ENDC)
+    exit(1)
