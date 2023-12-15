@@ -2,7 +2,7 @@ from collections import defaultdict
 import os, re, string
 import numpy as np
 import numpy.typing as npt
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 
 def sentencize(str) -> List[str]:
@@ -12,6 +12,30 @@ def sentencize(str) -> List[str]:
 def tokenize(str) -> List[str]:
     return str.lower().translate(str.maketrans('', '', string.punctuation)).split()
     # return str.lower().replace('. ', ' ').split()
+
+
+class SentencePosition:
+    doc_index: int
+    sentence_index: int
+
+    def __init__(self, doc_index:int, sentence_index:int) -> None:
+        self.doc_index = doc_index
+        self.sentence_index = sentence_index
+
+    @staticmethod
+    def from_tuple(tup):
+        return SentencePosition(tup[0],tup[1])
+
+    def to_tuple(self)->Tuple[int,int]:
+        return (self.doc_index, self.sentence_index)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.doc_index == other.doc_index and self.sentence_index == other.sentence_index
+        if isinstance(other, tuple):
+            return self == SentencePosition.from_tuple(other)
+
+        return False
 
 class DataProcessor:
     paths: List[str]
@@ -29,6 +53,9 @@ class DataProcessor:
 
     def add_file(self, path) -> None:
         self.paths.append(path)
+
+    def sentence_positions(self, word:str):
+        return [SentencePosition(doc_key, sentence_i) for doc_key,array in self.occur_dict[word].items() for sentence_i,occur in enumerate(array) if occur != 0]
 
     def generate(self):
         self.word_count_in_each_doc = np.zeros(len(self.paths), np.uint16)
@@ -54,15 +81,14 @@ class DataProcessor:
         if word not in self.occur_dict:
             raise KeyError(f"Error: word \"{word}\" not found in this instance of DataProcessor.")
 
-    def sentence_at(self, doc_index:int, sentence_index:int):
-        with open(self.paths[doc_index]) as file:
+    def sentence_at(self, sp:SentencePosition):
+        with open(self.paths[sp.doc_index]) as file:
             data = file.read()
-        return sentencize(data)[sentence_index]
+        return sentencize(data)[sp.sentence_index]
 
     def occurences(self, word:str) -> int:
         self.check_word(word)
         return np.sum(np.concatenate(list(self.occur_dict[word].values())))
-
 
     def document_occurences(self, word:str, index:int) -> int:
         if index >= len(self.paths) or index < 0:
