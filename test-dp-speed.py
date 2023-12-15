@@ -1,7 +1,7 @@
-import sys, time, os
+import sys, time
 
-from bcolors import bcolors
-from data_processor import DataProcessor
+from modules.bcolors import bcolors
+from modules.dataprocessor import DataProcessor
 # testing the speed
 file_count = 200
 time_limit = 0.25

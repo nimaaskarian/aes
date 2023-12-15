@@ -3,7 +3,7 @@ from typing import Dict, List
 import numpy.typing as npt
 import numpy as np
 
-from data_processor import DataProcessor
+from .dataprocessor import DataProcessor
 
 class SearchEngine:
     tf_idf_dict:Dict[str, npt.NDArray]
@@ -11,8 +11,6 @@ class SearchEngine:
     def __init__(self, paths:List[str]) -> None:
         self.tf_idf_dict = dict()
         self.dp = DataProcessor()
-        # for path in paths:
-        #     self.dp.add_file(path)
         self.dp.paths = paths
         self.dp.generate()
 
