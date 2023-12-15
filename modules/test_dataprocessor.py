@@ -1,5 +1,5 @@
 import unittest
-from modules.dataprocessor import DataProcessor, SentencePosition
+from dataprocessor import DataProcessor, SentencePosition
 
 class TestDataProcessor(unittest.TestCase):
     def setUp(self):

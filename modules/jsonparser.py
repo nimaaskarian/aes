@@ -10,7 +10,7 @@ class Documents:
         self.candidates = candidates
         self.selected = selected
 
-def json_docs(path)->List:
+def json_return_docs(path)->List:
     with open(path) as file:
         data = json.load(file)
 
