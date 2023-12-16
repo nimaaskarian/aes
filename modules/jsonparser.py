@@ -20,4 +20,4 @@ def json_return_docs(path)->List:
         return [Documents(document["query"], document["candidate_documents_id"], index_parser(document["is_selected"], 1)) for document in jsondata]
 
 if __name__ == "__main__":
-    json_return_docs("data.json")
+    print(json_return_docs("data.json"))

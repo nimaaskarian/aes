@@ -22,10 +22,12 @@ class SentencePosition:
 class DataProcessor:
     paths: List[str]
     occur_dict:Dict[str,Dict[int,npt.NDArray]]
+    sentences:list
     def __init__(self, path=None) -> None:
         self.occur_dict = defaultdict(dict)
         self.sentences_size = list()
         self.paths = list()
+        self.sentences = list()
         if path is not None:
             self.add_file(path)
 
@@ -35,6 +37,9 @@ class DataProcessor:
 
     def add_file(self, path) -> None:
         self.paths.append(path)
+
+    def all_sentences(self):
+        return [SentencePosition(doc_key, sentence_i) for word in self.occur_dict for doc_key, array in self.occur_dict[word].items() for sentence_i,occur in enumerate(array) if occur != 0]
 
     def sentence_positions(self, word:str):
         return [SentencePosition(doc_key, sentence_i) for doc_key,array in self.occur_dict[word].items() for sentence_i,occur in enumerate(array) if occur != 0]
@@ -52,10 +57,12 @@ class DataProcessor:
                 # sentence count
                 self.occur_dict[token][doc_index] = np.zeros(self.sentences_size[doc_index],np.uint8)
 
+            self.sentences.append([])
             for i, sentence in enumerate(sentences):
                 sentence_tokens = tokenize(sentence)
                 # self.doc_wordcount_list[doc_index] += len(sentence_tokens)
-                for token in set(sentence_tokens):
+                self.sentences[-1].append(set(sentence_tokens))
+                for token in self.sentences[-1][-1]:
                     self.occur_dict[token][doc_index][i] = sentence_tokens.count(token)
 
     # development helpers
