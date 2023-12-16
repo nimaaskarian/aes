@@ -1,6 +1,9 @@
 import unittest
 from dataprocessor import DataProcessor, SentencePosition
 
+def list_to_sentence_position(tuple_list):
+    return [SentencePosition(*tup) for tup in tuple_list]
+
 class TestDataProcessor(unittest.TestCase):
     def setUp(self):
         self.dp = DataProcessor()
@@ -16,10 +19,10 @@ class TestDataProcessor(unittest.TestCase):
         self.assertEqual(self.dp.docs_occurances_list("test").tolist(), [2, 2, 0, 0])
 
     def test_sentence_positions(self):
-        self.assertEqual(self.dp.sentence_positions("this"), [(0,0), (0,1), (0,2), (0,3), (1,1), (2,2)])
-        self.assertEqual(self.dp.sentence_positions("the"), [(2,1)])
-        self.assertEqual(self.dp.sentence_positions("test"), [(0,0), (0,2), (1,1), (1,2)])
-        self.assertEqual(self.dp.sentence_positions("lorem"), [(1,0), (3,0), (3,2), (3,4), (3,5)])
+        self.assertEqual(self.dp.sentence_positions("this"),   list_to_sentence_position([(0,0), (0,1), (0,2), (0,3), (1,1), (2,2)]))
+        self.assertEqual(self.dp.sentence_positions("the"),    list_to_sentence_position([(2,1)]))
+        self.assertEqual(self.dp.sentence_positions("test"),   list_to_sentence_position([(0,0), (0,2), (1,1), (1,2)]))
+        self.assertEqual(self.dp.sentence_positions("lorem"),  list_to_sentence_position([(1,0), (3,0), (3,2), (3,4), (3,5)]))
 
     def test_sentence_at(self):
         self.assertEqual(self.dp.sentence_at(SentencePosition(0, 1)), "it should have no in this sentence")

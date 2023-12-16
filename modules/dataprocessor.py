@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from collections import defaultdict
 import os, re, string
 import numpy as np
@@ -13,29 +14,10 @@ def tokenize(str) -> List[str]:
     return str.lower().translate(str.maketrans('', '', string.punctuation)).split()
     # return str.lower().replace('. ', ' ').split()
 
-
+@dataclass
 class SentencePosition:
     doc_index: int
     sentence_index: int
-
-    def __init__(self, doc_index:int, sentence_index:int) -> None:
-        self.doc_index = doc_index
-        self.sentence_index = sentence_index
-
-    @staticmethod
-    def from_tuple(tup):
-        return SentencePosition(tup[0],tup[1])
-
-    def to_tuple(self)->Tuple[int,int]:
-        return (self.doc_index, self.sentence_index)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.doc_index == other.doc_index and self.sentence_index == other.sentence_index
-        if isinstance(other, tuple):
-            return self == SentencePosition.from_tuple(other)
-
-        return False
 
 class DataProcessor:
     paths: List[str]
