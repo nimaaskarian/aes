@@ -1,18 +1,23 @@
-import json
+from dataclasses import dataclass
+import ijson
 from typing import List
 
+@dataclass
 class Documents:
     query:str
     candidates: List[int]
-    selected: int
-    def __init__(self, query, candidates, selected) -> None:
-        self.query = query
-        self.candidates = candidates
-        self.selected = selected
+    selected: int|None
+
+def index_parser(lst, value):
+    try:
+        return lst.index(value)
+    except ValueError:
+        return None
 
 def json_return_docs(path)->List:
-    with open(path) as file:
-        data = json.load(file)
+    with open(path, 'rb') as file:
+        jsondata = ijson.items(file, 'item')
+        return [Documents(document["query"], document["candidate_documents_id"], index_parser(document["is_selected"], 1)) for document in jsondata]
 
-    return [Documents(document["query"], document["candidate_documents_id"], document["is_selected"].index(1)) 
-              for document in data]
+if __name__ == "__main__":
+    json_return_docs("data.json")
