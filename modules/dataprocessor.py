@@ -48,8 +48,18 @@ class DataProcessor:
         return cosine_similarity(self.document_tfidfs)
 
     def calculate_query_similarities(self, query:str):
-        query_vector = self.tfidf_vectorizer.transform([query])
+        query_vector = self.tfidf_vectorizer.transform(query)
         return cosine_similarity(query_vector, self.document_tfidfs)
+
+    def find_n_most_similar(self, similarities, n:int):
+        # most_similar_doc_index = np.argmax(similarities)
+        return np.argsort(similarities)[-1][len(similarities)-n-1:]
+        # print("Most relevant document:", most_similar_doc_index)
+        # similarities
+
+    def document_at(self, index:int):
+        with open(self.paths[index]) as file:
+            return file.read()
 
 class DataProcessorDocs(DataProcessor):
     def generate_tfidf(self):
@@ -70,12 +80,27 @@ class DataProcessorSentences(DataProcessor):
         sentences = list()
         for path in self.paths:
             with open(path) as file:
-                sentences+=sentencize(file.read())
-                self.documents_sentences_count.append(len(sentences[-1]))
+                current_sentences = sentencize(file.read())
+                sentences+=current_sentences
+                self.documents_sentences_count.append(len(current_sentences))
 
         self.tfidf_vectorizer = TfidfVectorizer(stop_words="english", use_idf=True)
         self.document_tfidfs = self.tfidf_vectorizer.fit_transform(sentences)
         self.generated = True
+
+    def sentence_index_to_position(self, index:int)->SentencePosition:
+        i = 0
+        # for i, count in enumerate(self.documents_sentences_count):
+        while index >= self.documents_sentences_count[i]:
+            index -= self.documents_sentences_count[i]
+            i+=1
+
+        return SentencePosition(i, index)
+
+    def sentence_at(self, sp:SentencePosition):
+        with open(self.paths[sp.doc_index]) as file:
+            return sentencize(file.read())[sp.sentence_index]
+
     # most_similar_doc_index = np.argmax(similarities)
     # print(np.argsort(similarities)[::-1])
     # print("Most relevant document:", most_similar_doc_index)
