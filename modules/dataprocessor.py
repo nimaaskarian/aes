@@ -1,9 +1,11 @@
-from dataclasses import dataclass
-from collections import defaultdict
 import os, re, string
+from typing import List
+from dataclasses import dataclass
+
 import numpy as np
-import numpy.typing as npt
-from typing import Dict, List, Tuple
+
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def sentencize(str) -> List[str]:
@@ -21,83 +23,60 @@ class SentencePosition:
 
 class DataProcessor:
     paths: List[str]
-    occur_dict:Dict[str,Dict[int,npt.NDArray]]
-    sentences:list
+    document_tfidfs: list
+    tfidf_vectorizer: TfidfVectorizer
     def __init__(self, path=None) -> None:
-        self.occur_dict = defaultdict(dict)
-        self.sentences_size = list()
         self.paths = list()
-        self.sentences = list()
         if path is not None:
             self.add_file(path)
+        self.generated = False
+
+    def set_paths(self, paths:List[str]) -> None:
+        self.paths = paths
+        self.generated = False
 
     def add_dir(self, dir) -> None:
         for file in os.listdir(dir):
             self.add_file(os.path.join(dir,file))
+        self.generated = False
 
     def add_file(self, path) -> None:
         self.paths.append(path)
+        self.generated = False
 
-    def all_sentences(self):
-        return [SentencePosition(doc_key, sentence_i) for word in self.occur_dict for doc_key, array in self.occur_dict[word].items() for sentence_i,occur in enumerate(array) if occur != 0]
+    def calculate_similarities(self):
+        return cosine_similarity(self.document_tfidfs)
 
-    def sentence_positions(self, word:str):
-        return [SentencePosition(doc_key, sentence_i) for doc_key,array in self.occur_dict[word].items() for sentence_i,occur in enumerate(array) if occur != 0]
+    def calculate_query_similarities(self, query:str):
+        query_vector = self.tfidf_vectorizer.transform([query])
+        return cosine_similarity(query_vector, self.document_tfidfs)
 
-    def generate(self):
-        self.word_count_in_each_doc = np.zeros(len(self.paths), np.uint16)
-        for doc_index, path in enumerate(self.paths):
+class DataProcessorDocs(DataProcessor):
+    def generate_tfidf(self):
+        self.document_tfidfs = list()
+        datas = list()
+        for path in self.paths:
             with open(path) as file:
-                data = file.read()
-            sentences = sentencize(data)
-            self.sentences_size.append(len(sentences))
-            self.word_count_in_each_doc[doc_index] = len(tokenize(data))
+                datas.append(file.read())
 
-            for token in set(tokenize(data)):
-                # sentence count
-                self.occur_dict[token][doc_index] = np.zeros(self.sentences_size[doc_index],np.uint8)
+        self.tfidf_vectorizer = TfidfVectorizer(stop_words="english", use_idf=True)
+        self.document_tfidfs = self.tfidf_vectorizer.fit_transform(datas)
+        self.generated = True
 
-            self.sentences.append([])
-            for i, sentence in enumerate(sentences):
-                sentence_tokens = tokenize(sentence)
-                # self.doc_wordcount_list[doc_index] += len(sentence_tokens)
-                self.sentences[-1].append(set(sentence_tokens))
-                for token in self.sentences[-1][-1]:
-                    self.occur_dict[token][doc_index][i] = sentence_tokens.count(token)
+class DataProcessorSentences(DataProcessor):
+    def generate_tfidf(self):
+        self.document_tfidfs = list()
+        self.documents_sentences_count = list()
+        sentences = list()
+        for path in self.paths:
+            with open(path) as file:
+                sentences+=sentencize(file.read())
+                self.documents_sentences_count.append(len(sentences[-1]))
 
-    # development helpers
-    def check_word(self, word:str):
-        if word not in self.occur_dict:
-            raise KeyError(f"Error: word \"{word}\" not found in this instance of DataProcessor.")
-
-    def sentence_at(self, sp:SentencePosition):
-        with open(self.paths[sp.doc_index]) as file:
-            data = file.read()
-        return sentencize(data)[sp.sentence_index]
-
-    def occurences(self, word:str) -> int:
-        self.check_word(word)
-        return np.sum(np.concatenate(list(self.occur_dict[word].values())))
-
-    def document_occurences(self, word:str, index:int) -> int:
-        if index >= len(self.paths) or index < 0:
-            raise IndexError(f"Error: index is not valid. valid indexes for this instance are between 0 and {len(self.paths)-1}.")
-        self.check_word(word)
-        try:
-            return np.sum(self.occur_dict[word][index])
-        except(KeyError):
-            return 0
-
-    def docs_occurances_list(self, word:str):
-        self.check_word(word)
-        output_arr = np.zeros(len(self.paths), np.uint16)
-        for key,value in self.occur_dict[word].items():
-            output_arr[key] = np.sum(value)
-        return output_arr
-
-    def __str__(self)->str:
-        output = ""
-        for key, value in self.occur_dict.items():
-            output+=f"'{key}': {value}\n"
-        return output
-
+        self.tfidf_vectorizer = TfidfVectorizer(stop_words="english", use_idf=True)
+        self.document_tfidfs = self.tfidf_vectorizer.fit_transform(sentences)
+        self.generated = True
+    # most_similar_doc_index = np.argmax(similarities)
+    # print(np.argsort(similarities)[::-1])
+    # print("Most relevant document:", most_similar_doc_index)
+    # similarities

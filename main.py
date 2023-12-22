@@ -7,4 +7,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     se = SearchEngine(args.files)
     se.calculate_tf_idf()
-    se.sentence_tf_idf("ok")
+    # se.sentence_tf_idf("ok")
+    se.cosine_similarity("microsoft")
