@@ -1,6 +1,7 @@
 import os, re, string
 from typing import List
 from dataclasses import dataclass
+import difflib
 
 import numpy as np
 
@@ -48,11 +49,14 @@ class DataProcessor:
         return cosine_similarity(self.document_tfidfs)
 
     def calculate_query_similarities(self, query:str):
+        query
         query_vector = self.tfidf_vectorizer.transform(query)
         return cosine_similarity(query_vector, self.document_tfidfs)
 
     def find_n_most_similar(self, similarities, n:int):
         # most_similar_doc_index = np.argmax(similarities)
+        if not np.sum(similarities):
+            raise RuntimeError("No similar document has found.")
         return np.argsort(similarities)[-1][len(similarities)-n-1:]
         # print("Most relevant document:", most_similar_doc_index)
         # similarities

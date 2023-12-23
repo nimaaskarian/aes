@@ -13,5 +13,5 @@ parser.add_argument('files',action="extend", nargs="*", type=is_file, default=[]
 parser.add_argument('-j', '--json', action="store", type=is_file, default="")
 parser.add_argument('-q', '--query', action="append", type=str, default=[])
 parser.add_argument('-c', '--doc-count', action="store", type=int, default=0)
-parser.add_argument('-t', '--type', action="store", type=str, default="DOCS")
+parser.add_argument('-s', '--sentences', action="store_true", default=False)
 parser.add_argument('-C', '--clusters', action="store", type=int, default=10)
