@@ -24,7 +24,6 @@ class SentencePosition:
 
 class DataProcessor:
     paths: List[str]
-    document_tfidfs: list
     tfidf_vectorizer: TfidfVectorizer
     def __init__(self, path=None) -> None:
         self.paths = list()
@@ -46,12 +45,11 @@ class DataProcessor:
         self.generated = False
 
     def calculate_similarities(self):
-        return cosine_similarity(self.document_tfidfs)
+        return cosine_similarity(self.matrix)
 
     def calculate_query_similarities(self, query:str):
-        query
         query_vector = self.tfidf_vectorizer.transform(query)
-        return cosine_similarity(query_vector, self.document_tfidfs)
+        return cosine_similarity(query_vector, self.matrix)
 
     def find_n_most_similar(self, similarities, n:int):
         # most_similar_doc_index = np.argmax(similarities)
@@ -65,21 +63,18 @@ class DataProcessor:
         with open(self.paths[index]) as file:
             return file.read()
 
-class DataProcessorDocs(DataProcessor):
-    def generate_tfidf(self):
-        self.document_tfidfs = list()
+    def generate(self):
         datas = list()
         for path in self.paths:
             with open(path) as file:
                 datas.append(file.read())
 
         self.tfidf_vectorizer = TfidfVectorizer(stop_words="english", use_idf=True)
-        self.document_tfidfs = self.tfidf_vectorizer.fit_transform(datas)
+        self.matrix = self.tfidf_vectorizer.fit_transform(datas)
         self.generated = True
 
 class DataProcessorSentences(DataProcessor):
-    def generate_tfidf(self):
-        self.document_tfidfs = list()
+    def generate(self):
         self.documents_sentences_count = list()
         sentences = list()
         for path in self.paths:
@@ -89,7 +84,7 @@ class DataProcessorSentences(DataProcessor):
                 self.documents_sentences_count.append(len(current_sentences))
 
         self.tfidf_vectorizer = TfidfVectorizer(stop_words="english", use_idf=True)
-        self.document_tfidfs = self.tfidf_vectorizer.fit_transform(sentences)
+        self.matrix = self.tfidf_vectorizer.fit_transform(sentences)
         self.generated = True
 
     def sentence_index_to_position(self, index:int)->SentencePosition:

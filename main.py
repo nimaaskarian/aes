@@ -1,5 +1,5 @@
 #!/bin/python3
-from modules.dataprocessor import DataProcessorSentences, DataProcessorDocs
+from modules.dataprocessor import DataProcessorSentences, DataProcessor
 from modules.cluster import ClusterDBSCAN, ClusterKmeans
 from modules.argparser import parser
 
@@ -9,14 +9,14 @@ if __name__ == "__main__":
     if args.sentences:
         dp = DataProcessorSentences()
     else:
-        dp = DataProcessorDocs()
+        dp = DataProcessor()
 
     if args.doc_count:
         dp.set_paths([f"data/document_{i}.txt" for i in range(args.doc_count)])
 
     if args.files:
         dp.set_paths(args.files)
-    dp.generate_tfidf()
+    dp.generate()
     
     if args.query:
         similarities = dp.calculate_query_similarities(args.query)
