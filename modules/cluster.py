@@ -7,6 +7,7 @@ class _Cluster:
     def __init__(self, clusterer) -> None:
         if clusterer is None:
             return
+        self.labels = clusterer.labels_
         self.clusters = {}
         for i, cluster_index in enumerate(clusterer.labels_):
             if cluster_index not in self.clusters:
