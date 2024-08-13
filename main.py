@@ -31,6 +31,6 @@ if __name__ == "__main__":
             print(dp.sentence_at(sp))
 
     else:
-        # clusters = ClusterKmeans(dp.calculate_similarities(), args.clusters).clusters
-        clusters = ClusterDBSCAN(dp.calculate_similarities(), eps=0.7).clusters
+        clusters = ClusterKmeans(dp.calculate_similarities(), args.clusters).clusters
+        # clusters = ClusterDBSCAN(dp.calculate_similarities(), eps=0.7).clusters
         print(clusters)
