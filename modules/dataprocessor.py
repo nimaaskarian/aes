@@ -11,7 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 def sentencize(str) -> List[str]:
     return list(filter(None, re.split(r'\.\s+', str)))
-    # return str.split('. ')
+    # return str.splitlines()
 
 def tokenize(str) -> List[str]:
     return str.lower().translate(str.maketrans('', '', string.punctuation)).split()
@@ -51,10 +51,12 @@ class DataProcessor:
         query_vector = self.tfidf_vectorizer.transform(query)
         return cosine_similarity(query_vector, self.matrix)
 
-    def find_n_most_similar(self, similarities, n:int):
-        # most_similar_doc_index = np.argmax(similarities)
+    def find_n_most_similar(self, similarities, n=1):
+        if n == 1:
+            return np.argmax(similarities)
         if not np.sum(similarities):
             raise RuntimeError("No similar document has found.")
+
         return np.argsort(similarities)[-1][len(similarities)-n-1:]
         # print("Most relevant document:", most_similar_doc_index)
         # similarities

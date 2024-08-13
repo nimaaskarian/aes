@@ -20,19 +20,17 @@ if __name__ == "__main__":
     
     if args.query:
         similarities = dp.calculate_query_similarities(args.query)
-        for i in dp.find_n_most_similar(similarities, 1):
-            doc_index = i
-            if args.sentences:
-                sp = dp.sentence_index_to_position(i)
-                doc_index = sp.doc_index
-                print(doc_index, sp.sentence_index)
-            print(dp.document_at(doc_index))
+        doc_index = dp.find_n_most_similar(similarities, 1)
+        if args.sentences:
+            sp = dp.sentence_index_to_position(doc_index)
+            doc_index = sp.doc_index
+        print(dp.document_at(doc_index))
 
-            if args.sentences:
-                print("This is the sentence in question:")
-                print(dp.sentence_at(sp))
+        if args.sentences:
+            print("This is the sentence in question:")
+            print(dp.sentence_at(sp))
 
     else:
-        clusters = ClusterKmeans(dp.calculate_similarities(), args.clusters).clusters
-        # clusters = ClusterDBSCAN(dp.calculate_similarities()).clusters
+        # clusters = ClusterKmeans(dp.calculate_similarities(), args.clusters).clusters
+        clusters = ClusterDBSCAN(dp.calculate_similarities(), eps=0.7).clusters
         print(clusters)
